@@ -15,6 +15,7 @@ function sleep(ms: number) {
 }
 
 class PinHandler {
+  private interval?: NodeJS.Timeout & number;
   constructor(
     private pin_number: number,
     private direction: 'read' | 'write'
@@ -41,6 +42,17 @@ class PinHandler {
       .then(() => sleep(500))
       .then(() => this.write(false));
 
+  public stopCycle = () => {
+    clearInterval(this.interval);
+  };
+
+  public startCycle = (ms: number) => {
+    this.stopCycle();
+    this.interval = setInterval(() => {
+      this.click();
+    }, ms);
+  };
+
   private setup = (() => {
     var promise: Promise<void>;
     return () =>
@@ -58,12 +70,10 @@ export class PhoneLock {
   private _locked_state: boolean;
   private onLockedStateListener?: (state: boolean) => void;
   private lock_pin: PinHandler;
-  private bell_pin: PinHandler;
 
   constructor() {
     this._locked_state = false;
     this.lock_pin = new PinHandler(7, 'write');
-    this.bell_pin = new PinHandler(22, 'read');
   }
 
   public get locked_state() {
@@ -74,6 +84,11 @@ export class PhoneLock {
     if (state !== this._locked_state) {
       console.log('Set lock state: ', state);
       this._locked_state = state;
+      if (state) {
+        this.lock_pin.stopCycle();
+      } else {
+        this.lock_pin.startCycle(seconds(3));
+      }
       if (this.onLockedStateListener) this.onLockedStateListener(state);
     }
   }
