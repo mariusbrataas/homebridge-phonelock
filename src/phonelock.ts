@@ -43,14 +43,14 @@ class PinHandler {
       .then(() => this.write(false));
 
   public stopCycle = () => {
-    clearInterval(this.interval);
+    clearInterval(this.interval as any);
   };
 
   public startCycle = (ms: number) => {
     this.stopCycle();
     this.interval = setInterval(() => {
       this.click();
-    }, ms);
+    }, ms) as NodeJS.Timeout & number;
   };
 
   private setup = (() => {
