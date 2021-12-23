@@ -1,0 +1,9 @@
+{
+  "pluginAlias": "HomebridgePhonelock",
+  "pluginType": "platform",
+  "singular": true,
+  "schema": {
+    "type": "object",
+    "properties": {}
+  }
+}
