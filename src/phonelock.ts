@@ -39,7 +39,7 @@ class PinHandler {
 
   public click = () =>
     this.write(true)
-      .then(() => sleep(500))
+      .then(() => sleep(300))
       .then(() => this.write(false));
 
   public stopCycle = () => {
@@ -48,6 +48,7 @@ class PinHandler {
 
   public startCycle = (ms: number) => {
     this.stopCycle();
+    this.click();
     this.interval = setInterval(() => {
       this.click();
     }, ms) as NodeJS.Timeout & number;
@@ -82,12 +83,11 @@ export class PhoneLock {
 
   private set locked_state(state: boolean) {
     if (state !== this._locked_state) {
-      console.log('Set lock state: ', state);
       this._locked_state = state;
       if (state) {
         this.lock_pin.stopCycle();
       } else {
-        this.lock_pin.startCycle(seconds(3));
+        this.lock_pin.startCycle(seconds(2));
       }
       if (this.onLockedStateListener) this.onLockedStateListener(state);
     }
@@ -99,13 +99,13 @@ export class PhoneLock {
 
   public setLockedState = (() => {
     var timeout: NodeJS.Timeout & number;
-    return (state: boolean, expire?: number) => {
+    return (state: boolean) => {
       clearTimeout(timeout);
       this.locked_state = state;
       if (!this.locked_state)
         timeout = setTimeout(() => {
           this.locked_state = true;
-        }, expire || seconds(10)) as NodeJS.Timeout & number;
+        }, seconds(60)) as NodeJS.Timeout & number;
     };
   })();
 }
