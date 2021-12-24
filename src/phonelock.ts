@@ -105,7 +105,7 @@ export class PhoneLock {
       if (!this.locked_state)
         timeout = setTimeout(() => {
           this.locked_state = true;
-        }, seconds(60)) as NodeJS.Timeout & number;
+        }, seconds(30)) as NodeJS.Timeout & number;
     };
   })();
 }
